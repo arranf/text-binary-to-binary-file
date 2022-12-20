@@ -1,13 +1,30 @@
+use argh::FromArgs;
 use anyhow::{bail, Result};
 use endio_bit::BEBitWriter;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Write};
 
-pub fn main() -> Result<()> {
-    let mut file_in = BufReader::new(File::open("input.txt").expect("open failed"));
 
+#[derive(FromArgs)]
+/// Create binary files from text files of 1s and 0s.
+struct Args {
+    
+    /// an optional input file path which is "input.txt" by default
+    #[argh(option, default = "String::from(\"input.txt\")")]
+    input: String,
+
+     /// an optional output file path which is "output.txt" by default
+    #[argh(option, default = "String::from(\"output.txt\")")]
+    output: String,
+}
+
+pub fn main() -> Result<()> {
+
+    let args: Args = argh::from_env();
+    let mut file_in = BufReader::new(File::open(args.input).expect("Failed to open file"));
+    
     let mut read_buf = Vec::<u8>::new();
-    let file_out = File::create("output")?;
+    let file_out = File::create(args.output)?;
     let mut buf_writer = BEBitWriter::new(file_out);
     let mut write_buf = Vec::<u8>::new();
 
